@@ -20,7 +20,7 @@ beforeEach((done) => {
     }).then(() => done());
 });
 
-describe('Test - Businesses', () => {
+describe('TEST - BUSINESSES', () => {
 
     describe('GET /api/v1/businesses', () => {
         it('should get all businesses',(done) => {
@@ -91,6 +91,13 @@ describe('Test - Businesses', () => {
             var id = new ObjectID();
             request(app)
                 .get(`/api/v1/businesses/${id.toHexString()}`)
+                .expect(404)
+                .end(done);
+        });
+
+        it('should return 404 for non object ids',(done) => {
+            request(app)
+                .get('/api/v1/businesses/123')
                 .expect(404)
                 .end(done);
         });
