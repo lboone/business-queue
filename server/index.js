@@ -1,3 +1,13 @@
+const env = process.env.NODE_ENV || 'development';
+
+if (env === 'development'){
+    process.env.PORT = 3001;
+    process.env.MONGODB_URI = 'mongodb://localhost:27017/BusinessQueues';
+} else if (env === 'test'){
+    process.env.PORT = 3001;
+    process.env.MONGODB_URI = 'mongodb://localhost:27017/BusinessQueuesTest';
+}
+
 const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -5,7 +15,7 @@ const bodyParser = require('body-parser');
 var {ObjectID,User, Business} = require('./models');
 
 var app = express();
-const port = process.env.PORT || 3001;
+const port = process.env.PORT;
 
 // Configure bodyParser middleware
 app.use(bodyParser.json());
