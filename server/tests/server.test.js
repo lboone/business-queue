@@ -105,13 +105,22 @@ describe('TEST - BUSINESSES', () => {
 
     describe('DELETE /api/v1/businesses/:id',()=>{
         it('should delete and return business doc',(done) => {
+            var hexId = businesses[0]._id.toHexString();
             request(app)
-                .delete(`/api/v1/businesses/${businesses[0]._id.toHexString()}`)
+                .delete(`/api/v1/businesses/${hexId}`)
                 .expect(200)
                 .expect((res) => {
-                    expect(res.body.business.name).toBe(businesses[0].name);
+                    expect(res.body.business._id).toBe(hexId);
                 })
-                .end(done);
+                .end((err,res)=> {
+                    if(err){
+                        return done(err);
+                    }
+                    Business.findById(hexId).then((business) => {
+                        expect(business).toBeFalsy();
+                        done();
+                    }).catch((err) => done(err));
+                });
     
         });
         
