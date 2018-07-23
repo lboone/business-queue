@@ -72,7 +72,7 @@ app.patch('/api/v1/businesses/:id',(req,res)=>{
             if(!business){
                 return res.status(404).send({'Error':'Business does not exist'});
             }
-            res.send((business));
+            res.send({business});
         }).catch((e) => res.status(400).send());
     } else {
         return res.status(404).send({'Error':'ID not valid!'});

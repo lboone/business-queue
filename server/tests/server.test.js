@@ -43,6 +43,7 @@ describe('TEST - BUSINESSES', () => {
                 .expect(200)
                 .expect((res) => {
                     expect(res.body.business.name).toBe(name);
+                    expect(typeof res.body.business.addedAt).toBe('number');
                 })
                 .end((err, res) => {
                     if(err){
@@ -140,4 +141,20 @@ describe('TEST - BUSINESSES', () => {
         });
     });
 
+    describe('PATCH /api/v1/businesses/:id',() => {
+        it('should update the business',(done) => {
+            var id = businesses[0]._id.toHexString();
+            var newName = 'A new name for this business';
+            request(app)
+                .patch(`/api/v1/businesses/${id}`)
+                .send({
+                    name: newName,
+                })
+                .expect(200)
+                .expect((res) => {
+                    expect(res.body.business.name).toBe(newName);
+                })
+                .end(done);
+        });
+    });
 });
