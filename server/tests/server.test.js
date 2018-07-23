@@ -2,12 +2,14 @@ const expect = require('expect');
 const request = require('supertest');
 
 var {app} = require('./../index');
-const {Business} = require('./../models');
+const {ObjectID,Business} = require('./../models');
 
 const businesses = [
     {
+         _id: new ObjectID(), 
         name: 'First test business'
     },{
+         _id: new ObjectID(), 
         name: 'Second test business'
     }
 ];
@@ -72,4 +74,18 @@ describe('Test - Businesses', () => {
             })
         });
     });
+
+    describe('GET /api/v1/businesses/:id',()=>{
+        it('should return business doc',(done) => {
+            request(app)
+                .get(`/api/v1/businesses/${businesses[0]._id.toHexString()}`)
+                .expect(200)
+                .expect((res) => {
+                    expect(res.body.business.name).toBe(businesses[0].name);
+                })
+                .end(done);
+    
+        });
+    });
+
 });

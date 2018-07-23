@@ -29,7 +29,7 @@ app.get('/api/v1/businesses',(req,res)=>{
     },(err)=>{
         res.status(400).send(err);
     });
-})
+});
 
 app.get('/api/v1/businesses/:id',(req,res)=>{
     var id = req.params.id;

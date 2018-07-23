@@ -8,7 +8,7 @@ module.exports = mongoose.model('Business',{
         trim: true
     },
     addedAt: {
-        type: Date,
+        type: Number,
         default: new Date()
     }
 });
