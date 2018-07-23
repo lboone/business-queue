@@ -5,6 +5,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 var {ObjectID,User, Business} = require('./models');
+const {authenticate} = require('./middleware/authenticate');
 
 var app = express();
 const port = process.env.PORT;
@@ -88,6 +89,12 @@ app.post('/api/v1/users',(req,res)=>{
     }).catch((e) => {
         res.status(400).send(e);
     });
+});
+
+// Login
+app.get('/api/v1/users/me',authenticate, (req,res)=>{
+    var user = req.user;
+    res.send({user});
 });
 
 // Start the server
