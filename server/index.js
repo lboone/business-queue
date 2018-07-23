@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
 
@@ -59,6 +60,22 @@ app.delete('/api/v1/businesses/:id',(req,res)=>{
         }).catch((error) => res.status(400).send({'Error':error}));
     } else {
         res.status(404).send({'Error':'ID not valid!'});
+    }
+});
+
+app.patch('/api/v1/businesses/:id',(req,res)=>{
+    var id = req.params.id;
+    if(ObjectID.isValid(id)){
+        var body = _.pick(req.body, ['name']);
+
+        Business.findByIdAndUpdate(id,{$set:body},{new: true}).then((business) => {
+            if(!business){
+                return res.status(404).send({'Error':'Business does not exist'});
+            }
+            res.send((business));
+        }).catch((e) => res.status(400).send());
+    } else {
+        return res.status(404).send({'Error':'ID not valid!'});
     }
 });
 
