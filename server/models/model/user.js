@@ -47,7 +47,7 @@ var UserSchema = new mongoose.Schema({
         } 
     },
     addedAt: {
-        type: Date,
+        type: Number,
         default: new Date()
     },
     tokens: [{
