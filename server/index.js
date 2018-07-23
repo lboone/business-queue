@@ -13,7 +13,7 @@ const port = process.env.PORT;
 app.use(bodyParser.json());
 
 
-// Add a Business
+// All Business routes
 app.post('/api/v1/businesses',(req,res)=>{
     var business = new Business({
         name: req.body.name
@@ -25,8 +25,6 @@ app.post('/api/v1/businesses',(req,res)=>{
         res.status(400).send(e);
     });
 });
-
-// Get all Businesses
 app.get('/api/v1/businesses',(req,res)=>{
     Business.find().then((businesses)=>{
         res.send({businesses});
@@ -34,7 +32,6 @@ app.get('/api/v1/businesses',(req,res)=>{
         res.status(400).send(err);
     });
 });
-
 app.get('/api/v1/businesses/:id',(req,res)=>{
     var id = req.params.id;
     if(ObjectID.isValid(id)){
@@ -49,7 +46,6 @@ app.get('/api/v1/businesses/:id',(req,res)=>{
         res.status(404).send({'Error':'ID not valid!'});
     }
 });
-
 app.delete('/api/v1/businesses/:id',(req,res)=>{
     var id = req.params.id;
     if(ObjectID.isValid(id)){
@@ -64,7 +60,6 @@ app.delete('/api/v1/businesses/:id',(req,res)=>{
         res.status(404).send({'Error':'ID not valid!'});
     }
 });
-
 app.patch('/api/v1/businesses/:id',(req,res)=>{
     var id = req.params.id;
     if(ObjectID.isValid(id)){
@@ -81,6 +76,21 @@ app.patch('/api/v1/businesses/:id',(req,res)=>{
     }
 });
 
+// All User routes
+// Signup
+app.post('/api/v1/users',(req,res)=>{
+    var body = _.pick(req.body,['email','password','firstName','lastName','userType']);
+    var user = new User(body);
+    user.save().then(()=>{
+        return user.generateAuthToken();
+    }).then((token) => {
+        res.header('x-auth', token).send({user})
+    }).catch((e) => {
+        res.status(400).send(e);
+    });
+});
+
+// Start the server
 app.listen(port,() => {
     console.log(`Started on port ${port}`);
 });

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-module.exports = mongoose.model('Business',{
+var BusinessSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
@@ -10,5 +10,31 @@ module.exports = mongoose.model('Business',{
     addedAt: {
         type: Number,
         default: new Date()
-    }
+    },
+    owners: [{
+        id: {
+            type: String,
+            required: true
+        }
+    }],
+    staff: [{
+        id: {
+            type: String,
+            required: true
+        }
+    }],
+    customers: [{
+        id: {
+            type: String,
+            required: true
+        }
+    }],
+    queues: [{
+        id: {
+            type: String,
+            required: true
+        }
+    }]
 });
+
+module.exports = mongoose.model('Business',BusinessSchema);
