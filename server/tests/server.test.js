@@ -103,4 +103,32 @@ describe('TEST - BUSINESSES', () => {
         });
     });
 
+    describe('DELETE /api/v1/businesses/:id',()=>{
+        it('should delete and return business doc',(done) => {
+            request(app)
+                .delete(`/api/v1/businesses/${businesses[0]._id.toHexString()}`)
+                .expect(200)
+                .expect((res) => {
+                    expect(res.body.business.name).toBe(businesses[0].name);
+                })
+                .end(done);
+    
+        });
+        
+        it('should return 404 if todo not found',(done) => {
+            var id = new ObjectID();
+            request(app)
+                .delete(`/api/v1/businesses/${id.toHexString()}`)
+                .expect(404)
+                .end(done);
+        });
+    
+        it('should return 404 for non object ids',(done) => {
+            request(app)
+                .delete('/api/v1/businesses/123')
+                .expect(404)
+                .end(done);
+        });
+    });
+
 });

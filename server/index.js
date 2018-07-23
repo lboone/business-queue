@@ -47,6 +47,20 @@ app.get('/api/v1/businesses/:id',(req,res)=>{
     }
 });
 
+app.delete('/api/v1/businesses/:id',(req,res)=>{
+    var id = req.params.id;
+    if(ObjectID.isValid(id)){
+        Business.findByIdAndDelete(id).then((business)=>{
+            if(!business){
+                res.status(404).send({'Error':'Business not found!'});
+            } else {
+                res.send({business});
+            }
+        }).catch((error) => res.status(400).send({'Error':error}));
+    } else {
+        res.status(404).send({'Error':'ID not valid!'});
+    }
+});
 
 app.listen(port,() => {
     console.log(`Started on port ${port}`);
