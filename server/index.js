@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 var {ObjectID,User, Business} = require('./models');
 
 var app = express();
+const port = process.env.PORT || 3001;
 
 // Configure bodyParser middleware
 app.use(bodyParser.json());
@@ -47,8 +48,8 @@ app.get('/api/v1/businesses/:id',(req,res)=>{
 });
 
 
-app.listen(3001,() => {
-    console.log('Started on port 3001');
+app.listen(port,() => {
+    console.log(`Started on port ${port}`);
 });
 
 module.exports = {app};
