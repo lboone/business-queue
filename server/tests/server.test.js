@@ -86,6 +86,14 @@ describe('Test - Businesses', () => {
                 .end(done);
     
         });
+
+        it('should return 404 if business not found',(done) => {
+            var id = new ObjectID();
+            request(app)
+                .get(`/api/v1/businesses/${id.toHexString()}`)
+                .expect(404)
+                .end(done);
+        });
     });
 
 });
