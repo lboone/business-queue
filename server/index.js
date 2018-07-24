@@ -82,6 +82,7 @@ app.patch('/api/v1/businesses/:id',(req,res)=>{
 app.post('/api/v1/users',(req,res)=>{
     var body = _.pick(req.body,['email','password','firstName','lastName','userType']);
     var user = new User(body);
+    
     user.save().then(()=>{
         return user.generateAuthToken();
     }).then((token) => {
