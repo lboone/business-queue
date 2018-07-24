@@ -161,8 +161,7 @@ describe('TEST - USERS', () => {
                     expect(res.body.user.email).toBe(users[0].email);
                 })
                 .end(done);
-        });
-    
+        });    
         it('should return 401 if not authenticated', (done) => {
             request(app)
                 .get('/api/v1/users/me')
@@ -173,7 +172,6 @@ describe('TEST - USERS', () => {
                 .end(done);
         });
     });
-
     describe('POST /api/v1/users',() => {
         it('should create a user',(done) => {
             var email = 'example@example.com';
@@ -198,7 +196,7 @@ describe('TEST - USERS', () => {
                         expect(user).toBeTruthy();
                         expect(user.password === password).toBeFalsy();
                         done();
-                    });
+                    }).catch((e) => done(e));
                 });
         });
         it('should return validation errors if request invalid', (done) => {
@@ -229,6 +227,52 @@ describe('TEST - USERS', () => {
                     expect(res.body['name'] == 'MongoError').toBeTruthy();
                 })
                 .end(done);
+        });
+    });
+    describe('POST /api/v1/users/login', () => {
+        it('should login user and return auth token', (done) => {
+            var email = users[1].email;
+            var password = users[1].password;
+            request(app)
+                .post('/api/v1/users/login')
+                .send({email,password})
+                .expect(200)
+                .expect((res) => {
+                    expect(res.headers['x-auth']).toBeTruthy();
+                })
+                .end((err, res) => {
+                    if(err){
+                        return done(err);
+                    }
+                    User.findById(users[1]._id).then((user) => {
+                        expect(user.tokens[0]).toMatchObject({
+                            access: 'auth',
+                            token: res.headers['x-auth']
+                        });
+                        done();
+                    }).catch((e) => done(e));
+                });
+        });
+    
+        it('should reject invalid login', (done) => {
+            var email = users[1].email + '1';
+            var password = users[1].password + '1';
+            request(app)
+                .post('/api/v1/users/login')
+                .send({email,password})
+                .expect(400)
+                .expect((res) => {
+                    expect(res.headers['x-auth']).toBeFalsy();
+                })
+                .end((err, res) => {
+                    if(err){
+                        return done(err);
+                    }
+                    User.findById(users[1]._id).then((user) => {
+                        expect(user.tokens.length).toBe(0);
+                        done();
+                    }).catch((e) => done(e));
+                });
         });
     });
 });

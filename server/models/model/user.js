@@ -100,9 +100,9 @@ UserSchema.statics.findByToken = function (token) {
     } catch (e) {
         return Promise.reject('Authentication error.  Please provide a valid token.');
     }
-
+    var id = decoded._id || decoded.id;
     return User.findOne({
-        '_id': decoded._id,
+        '_id': id,
         'tokens.token': token,
         'tokens.access': 'auth'
     });
