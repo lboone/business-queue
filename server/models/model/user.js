@@ -101,7 +101,7 @@ UserSchema.statics.findByToken = function (token) {
     }
 
     return User.findOne({
-        '_id': decoded._id,
+        '_id': decoded.id,
         'tokens.token': token,
         'tokens.access': 'auth'
     });
@@ -111,7 +111,6 @@ UserSchema.pre('save',function(next){
     
     if(user.isModified('password')){
         var password = user.password;
-        console.log(user);
         bcrypt.genSalt(10,(err,salt)=>{
                 bcrypt.hash(password,salt,(err,hash)=>{
                     user.password = hash;

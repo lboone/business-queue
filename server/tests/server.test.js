@@ -2,23 +2,13 @@ const expect = require('expect');
 const request = require('supertest');
 
 var {app} = require('./../index');
-const {ObjectID,Business} = require('./../models');
+const {ObjectID,Business, User} = require('./../models');
+const {businesses, populateBusinesses, users, populateUsers} = require('./seed/seed');
 
-const businesses = [
-    {
-         _id: new ObjectID(), 
-        name: 'First test business'
-    },{
-         _id: new ObjectID(), 
-        name: 'Second test business'
-    }
-];
 
-beforeEach((done) => {
-    Business.remove({}).then(() => {
-        return Business.insertMany(businesses);
-    }).then(() => done());
-});
+beforeEach(populateUsers);
+beforeEach(populateBusinesses);
+
 
 describe('TEST - BUSINESSES', () => {
 
@@ -153,6 +143,90 @@ describe('TEST - BUSINESSES', () => {
                 .expect(200)
                 .expect((res) => {
                     expect(res.body.business.name).toBe(newName);
+                })
+                .end(done);
+        });
+    });
+});
+
+describe('TEST - USERS', () => {
+    describe('GET /api/v1/users/me', () =>{
+        it('should return user is authenticated', (done) => {
+            request(app)
+                .get('/api/v1/users/me')
+                .set('x-auth',users[0].tokens[0].token)
+                .expect(200)
+                .expect((res) => {
+                    expect(res.body.user._id).toBe(users[0]._id.toHexString());
+                    expect(res.body.user.email).toBe(users[0].email);
+                })
+                .end(done);
+        });
+    
+        it('should return 401 if not authenticated', (done) => {
+            request(app)
+                .get('/api/v1/users/me')
+                .expect(401)
+                .expect((res) => {
+                    expect(res.body).toEqual({"Error":"Authentication error.  Please provide a valid token."});
+                })
+                .end(done);
+        });
+    });
+
+    describe('POST /api/v1/users',() => {
+        it('should create a user',(done) => {
+            var email = 'example@example.com';
+            var password = '123mnb!1234';
+            var firstName = 'Example';
+            var lastName = 'Example';
+            request(app)
+                .post('/api/v1/users')
+                .send({email,password,firstName,lastName})
+                .expect(200)
+                .expect((res) => {
+                    expect(res.headers['x-auth']).toBeTruthy();
+                    expect(res.body.user._id).toBeTruthy();
+                    expect(res.body.user.email).toBe(email);
+                    expect(res.body.user.userType).toBe('Customer');
+                })
+                .end((err) => {
+                    if(err){
+                        return done(err);
+                    }
+                    User.findOne({email}).then((user) => {
+                        expect(user).toBeTruthy();
+                        expect(user.password === password).toBeFalsy();
+                        done();
+                    });
+                });
+        });
+        it('should return validation errors if request invalid', (done) => {
+            var email = 'example';
+            var password = '123mnb!';
+            request(app)
+                .post('/api/v1/users')
+                .send({email,password})
+                .expect(400)
+                .expect((res) => {
+                    expect(res.body['errors']['email']).toBeTruthy();
+                    expect(res.body['errors']['password']).toBeTruthy();
+                    expect(res.body['errors']['firstName']).toBeTruthy();
+                    expect(res.body['errors']['lastName']).toBeTruthy();
+                })
+                .end(done);
+        });
+        it('should not create user if email in use', (done) => {
+            var email = users[0].email;
+            var password = '123mnb!1234';
+            var firstName = 'Example';
+            var lastName = 'Example';
+            request(app)
+                .post('/api/v1/users')
+                .send({email,password,firstName,lastName})
+                .expect(400)
+                .expect((res) => {
+                    expect(res.body['name'] == 'MongoError').toBeTruthy();
                 })
                 .end(done);
         });
