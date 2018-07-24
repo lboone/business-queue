@@ -92,12 +92,22 @@ app.post('/api/v1/users',(req,res)=>{
     });
 });
 
-// Login
+// User Profile
 app.get('/api/v1/users/me',authenticate, (req,res)=>{
     var user = req.user;
     res.send({user});
 });
 
+app.post('/api/v1/users/login',(req,res)=>{
+    var body = _.pick(req.body,['email','password']);
+    User.findByCredentials(body.email,body.password).then((user) => {
+        return user.generateAuthToken().then((token) => {
+            res.header('x-auth', token).send({user})
+        });
+    }).catch((e) => {
+        res.status(400).send({'Error':'A user with that email and password does not exist'});
+    });
+});
 // Start the server
 app.listen(port,() => {
     console.log(`Started on port ${port}`);
