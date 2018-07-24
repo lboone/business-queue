@@ -108,6 +108,15 @@ app.post('/api/v1/users/login',(req,res)=>{
         res.status(400).send({'Error':'A user with that email and password does not exist'});
     });
 });
+
+app.delete('/api/v1/users/me/token',authenticate, (req,res) => {
+    req.user.removeToken(req.token).then(() => {
+        res.status(200).send({'Success':'You have successfully removed the token'});
+    }, (e) => {
+       res.status(400).send({'Error':e}); 
+    });
+});
+
 // Start the server
 app.listen(port,() => {
     console.log(`Started on port ${port}`);
