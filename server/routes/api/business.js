@@ -1,5 +1,5 @@
 const express = require('express');
-const {authenticate} = require('./../../middleware/authenticate');
+const {authenticate, isOwner, isStaff, isCustomer} = require('./../../middleware');
 const _ = require('lodash');
 const {ObjectID, Business} = require('./../../models');
 
@@ -10,16 +10,18 @@ module.exports = (function(){
     // Route: {api/v?}/businesses
     // Parameters:
     // name: required
-    apiBusiness.post('/',(req,res)=>{
+    // header: x-auth - user token
+    apiBusiness.post('/',authenticate,isOwner,(req,res)=>{
         var business = new Business({
-            name: req.body.name
+            name: req.body.name,
+            _creator: req.user._id
         });
         business.save().then((business) => {
             res.send({business});
         }, (e) => {
             
             res.status(400).send(e);
-        });
+        });        
     });
 
     // Route: {api/v?}/businesses
@@ -54,7 +56,7 @@ module.exports = (function(){
     // Route: {api/v?}/businesses/:id
     // Parameters:
     // id: required
-    apiBusiness.delete('/:id',(req,res)=>{
+    apiBusiness.delete('/:id',authenticate,isOwner,(req,res)=>{
         var id = req.params.id;
         if(ObjectID.isValid(id)){
             Business.findByIdAndDelete(id).then((business)=>{
@@ -73,7 +75,7 @@ module.exports = (function(){
     // Parameters:
     // id: required
     // name: required
-    apiBusiness.patch('/:id',(req,res)=>{
+    apiBusiness.patch('/:id',authenticate,isOwner,(req,res)=>{
         var id = req.params.id;
         if(ObjectID.isValid(id)){
             var body = _.pick(req.body, ['name']);

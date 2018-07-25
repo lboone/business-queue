@@ -27,9 +27,11 @@ describe('TEST - BUSINESSES', () => {
     describe('POST /api/v1/businesses', ()=>{
         it('should create a new business',(done) => {
             var name = 'Test business name';
+            var _creator = users[0]._id;
             request(app)
                 .post('/api/v1/businesses')
-                .send({name})
+                .send({name,_creator})
+                .set('x-auth',users[0].tokens[0].token)
                 .expect(200)
                 .expect((res) => {
                     expect(res.body.business.name).toBe(name);
@@ -52,6 +54,7 @@ describe('TEST - BUSINESSES', () => {
             request(app)
             .post('/api/v1/businesses')
             .send({})
+            .set('x-auth',users[0].tokens[0].token)
             .expect(400)
             .end((err, res) => {
                 if(err) {
@@ -100,6 +103,7 @@ describe('TEST - BUSINESSES', () => {
             request(app)
                 .delete(`/api/v1/businesses/${hexId}`)
                 .expect(200)
+                .set('x-auth',users[0].tokens[0].token)
                 .expect((res) => {
                     expect(res.body.business._id).toBe(hexId);
                 })
@@ -115,10 +119,11 @@ describe('TEST - BUSINESSES', () => {
     
         });
         
-        it('should return 404 if todo not found',(done) => {
+        it('should return 404 if business not found',(done) => {
             var id = new ObjectID();
             request(app)
                 .delete(`/api/v1/businesses/${id.toHexString()}`)
+                .set('x-auth',users[0].tokens[0].token)
                 .expect(404)
                 .end(done);
         });
@@ -126,6 +131,7 @@ describe('TEST - BUSINESSES', () => {
         it('should return 404 for non object ids',(done) => {
             request(app)
                 .delete('/api/v1/businesses/123')
+                .set('x-auth',users[0].tokens[0].token)
                 .expect(404)
                 .end(done);
         });
@@ -137,6 +143,7 @@ describe('TEST - BUSINESSES', () => {
             var newName = 'A new name for this business';
             request(app)
                 .patch(`/api/v1/businesses/${id}`)
+                .set('x-auth',users[0].tokens[0].token)
                 .send({
                     name: newName,
                 })

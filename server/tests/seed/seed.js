@@ -1,15 +1,6 @@
 const {ObjectID, Business, User} = require('./../../models');
 const jwt = require('jsonwebtoken');
 
-const businesses = [
-    {
-         _id: new ObjectID(), 
-        name: 'First test business'
-    },{
-         _id: new ObjectID(), 
-        name: 'Second test business'
-    }
-];
 const userOneId = new ObjectID();
 const userTwoId = new ObjectID();
 
@@ -18,7 +9,7 @@ const users = [{
     email: 'lloyd@example.com',
     firstName: 'Lloyd',
     lastName: 'Boone',
-    userType: 'Customer',
+    userType: 'Owner',
     password: 'userOnePass',
     tokens: [{
         access: 'auth',
@@ -32,6 +23,18 @@ const users = [{
     userType: 'Customer',
     password: 'userTwoPass'
 }];
+
+const businesses = [
+    {
+         _id: new ObjectID(), 
+        name: 'First test business',
+        _creator: userOneId
+    },{
+         _id: new ObjectID(), 
+        name: 'Second test business',
+        _creator: userTwoId
+    }
+];
 
 const populateUsers = (done) => {
     User.remove({}).then(() => {
