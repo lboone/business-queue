@@ -21,7 +21,11 @@ const users = [{
     firstName: 'Melissa',
     lastName: 'Boone',
     userType: 'Customer',
-    password: 'userTwoPass'
+    password: 'userTwoPass',
+    tokens: [{
+        access: 'auth',
+        token: jwt.sign({id: userTwoId, access: 'auth'},'abc123').toString()
+    }]
 }];
 
 const businesses = [

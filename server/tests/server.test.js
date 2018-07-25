@@ -11,7 +11,6 @@ beforeEach(populateBusinesses);
 
 
 describe('TEST - BUSINESSES', () => {
-
     describe('GET /api/v1/businesses', () => {
         it('should get all businesses',(done) => {
             request(app)
@@ -23,7 +22,6 @@ describe('TEST - BUSINESSES', () => {
                 .end(done);
         })
     });
-
     describe('POST /api/v1/businesses', ()=>{
         it('should create a new business',(done) => {
             var name = 'Test business name';
@@ -68,7 +66,6 @@ describe('TEST - BUSINESSES', () => {
             })
         });
     });
-
     describe('GET /api/v1/businesses/:id',()=>{
         it('should return business doc',(done) => {
             request(app)
@@ -96,7 +93,6 @@ describe('TEST - BUSINESSES', () => {
                 .end(done);
         });
     });
-
     describe('DELETE /api/v1/businesses/:id',()=>{
         it('should delete and return business doc',(done) => {
             var hexId = businesses[0]._id.toHexString();
@@ -118,7 +114,24 @@ describe('TEST - BUSINESSES', () => {
                 });
     
         });
-        
+
+        it('should not delete and return business doc if not creator',(done) => {
+            var hexId = businesses[0]._id.toHexString();
+            request(app)
+                .delete(`/api/v1/businesses/${hexId}`)
+                .expect(401)
+                .set('x-auth',users[1].tokens[0].token)
+                .end((err,res)=> {
+                    if(err){
+                        return done(err);
+                    }
+                    Business.findById(hexId).then((business) => {
+                        expect(business).toBeTruthy();
+                        done();
+                    }).catch((err) => done(err));
+                });
+    
+        });
         it('should return 404 if business not found',(done) => {
             var id = new ObjectID();
             request(app)
@@ -136,7 +149,6 @@ describe('TEST - BUSINESSES', () => {
                 .end(done);
         });
     });
-
     describe('PATCH /api/v1/businesses/:id',() => {
         it('should update the business',(done) => {
             var id = businesses[0]._id.toHexString();
@@ -260,7 +272,6 @@ describe('TEST - USERS', () => {
                     }).catch((e) => done(e));
                 });
         });
-    
         it('should reject invalid login', (done) => {
             var email = users[1].email + '1';
             var password = users[1].password + '1';
@@ -271,18 +282,9 @@ describe('TEST - USERS', () => {
                 .expect((res) => {
                     expect(res.headers['x-auth']).toBeFalsy();
                 })
-                .end((err, res) => {
-                    if(err){
-                        return done(err);
-                    }
-                    User.findById(users[1]._id).then((user) => {
-                        expect(user.tokens.length).toBe(0);
-                        done();
-                    }).catch((e) => done(e));
-                });
+                .end(done);
         });
     });
-
     describe('DELETE /api/v1/users/me/token',() => {
         it('should remove auth token on logout', (done) => {
             request(app)
@@ -296,7 +298,7 @@ describe('TEST - USERS', () => {
                     if(err){
                         return done(err);
                     }
-                    User.findById(users[1]._id).then((user) => {
+                    User.findById(users[0]._id).then((user) => {
                         expect(user.tokens.length).toBe(0);
                         done();
                     }).catch((e) => done(e));

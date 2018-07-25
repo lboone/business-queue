@@ -59,7 +59,10 @@ module.exports = (function(){
     apiBusiness.delete('/:id',authenticate,isOwner,(req,res)=>{
         var id = req.params.id;
         if(ObjectID.isValid(id)){
-            Business.findByIdAndDelete(id).then((business)=>{
+            Business.findOneAndDelete({
+                _id: id,
+                _creator: req.user._id
+            }).then((business)=>{
                 if(!business){
                     res.status(404).send({'Error':'Business not found!'});
                 } else {
