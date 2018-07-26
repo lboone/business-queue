@@ -1,3 +1,4 @@
 node_modules
 package-lock.json
 index_orig.js
+server/config/config.json
